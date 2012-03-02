@@ -68,12 +68,14 @@ namespace ChromiumTabs
             foreach (UIElement element in this.Children)
             {
                 double thickness = 0.0;
+                double leftOffset = 0.0;
                 Control c = element as Control;
                 if(c != null)
                 {
                     thickness = c.Margin.Bottom;
+                    leftOffset = c.Margin.Left;
                 }
-                element.Arrange(new Rect(offset, 0, 100, finalSize.Height - thickness));
+                element.Arrange(new Rect(offset - leftOffset, 0, 100, finalSize.Height - thickness));
                 offset += 90;
             }
             return finalSize;
