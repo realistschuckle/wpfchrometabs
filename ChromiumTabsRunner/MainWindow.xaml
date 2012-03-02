@@ -1,0 +1,22 @@
+﻿<Window x:Class="ChromiumTabsRunner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:my="clr-namespace:ChromiumTabs;assembly=ChromiumTabs"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <my:ChromiumTabControl>
+            <my:ChromiumTabItem Header="One" Background="Orange">
+                <Button>Uno</Button>
+            </my:ChromiumTabItem>
+            <my:ChromiumTabItem Header="Two" Background="Green">
+                <Label>Dos</Label>
+            </my:ChromiumTabItem>
+            <my:ChromiumTabItem Header="Three" Background="Green" IsSelected="True">
+                <Label>Tres</Label>
+            </my:ChromiumTabItem>
+            <my:ChromiumTabItem Header="Four" Background="Green">
+                <Label>Quattro</Label>
+            </my:ChromiumTabItem>
+        </my:ChromiumTabControl>
+    </Grid>
+</Window>
