@@ -94,7 +94,7 @@
                             </Path.RenderTransform>
                         </Path>
                         <Label VerticalAlignment="Center" Content="{TemplateBinding Header}" Grid.Column="1" />
-                        <Button Style="{StaticResource CloseButtonStyle}" Grid.Column="2" />
+                        <Button Style="{StaticResource CloseButtonStyle}" Grid.Column="2" Command="{x:Static local:ChromiumTabItem.CloseTabCommand}" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">

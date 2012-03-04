@@ -74,7 +74,7 @@ namespace ChromiumTabs
             set { SetValue(SelectedContentProperty, value); }
         }
 
-        public void ChangeSelectedItem(ChromiumTabItem item)
+        internal void ChangeSelectedItem(ChromiumTabItem item)
         {
             for (int i = 0; i < this.Items.Count; i += 1)
             {
@@ -85,6 +85,39 @@ namespace ChromiumTabs
                     this.SelectedIndex = i;
                     return;
                 }
+            }
+        }
+
+        internal void RemoveTab(object tab)
+        {
+            int selectedIndex = this.SelectedIndex;
+            bool removedSelectedTab = false;
+            ChromiumTabItem removeItem = this.AsTabItem(tab);
+            foreach (object item in this.Items)
+            {
+                ChromiumTabItem tabItem = this.AsTabItem(item);
+                if (tabItem != null && tabItem == removeItem)
+                {
+                    if (tabItem.Content == this.SelectedContent)
+                    {
+                        removedSelectedTab = true;
+                    }
+                    if (this.ObjectToContainer.ContainsKey(tab))
+                    {
+                        this.ObjectToContainer.Remove(tab);
+                    }
+                    this.Items.Remove(item);
+                    break;
+                }
+            }
+            if (removedSelectedTab && this.Items.Count > 0)
+            {
+                this.SelectedItem = this.Items[Math.Min(selectedIndex, this.Items.Count - 1)];
+            }
+            else if (removedSelectedTab)
+            {
+                this.SelectedItem = null;
+                this.SelectedContent = null;
             }
         }
 
@@ -115,7 +148,7 @@ namespace ChromiumTabs
                 ChromiumTabItem.SetIsSelected(element, false);
             }
             ChromiumTabItem item = this.AsTabItem(this.SelectedItem);
-            this.SelectedContent = item.Content;
+            this.SelectedContent = item != null? item.Content : null;
         }
 
         protected override bool IsItemItsOwnContainerOverride(object item)

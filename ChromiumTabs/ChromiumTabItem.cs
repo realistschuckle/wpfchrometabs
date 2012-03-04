@@ -47,6 +47,12 @@ namespace ChromiumTabs
     public class ChromiumTabItem : HeaderedContentControl
     {
         public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromiumTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
+        private static readonly RoutedUICommand closeTabCommand = new RoutedUICommand("Close tab", "CloseTab", typeof(ChromiumTabItem));
+
+        public static RoutedUICommand CloseTabCommand
+        {
+            get { return closeTabCommand; }
+        }
 
         public static void SetIsSelected(DependencyObject item, bool value)
         {
@@ -61,12 +67,18 @@ namespace ChromiumTabs
         static ChromiumTabItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromiumTabItem), new FrameworkPropertyMetadata(typeof(ChromiumTabItem)));
+            CommandManager.RegisterClassCommandBinding(typeof(ChromiumTabItem), new CommandBinding(closeTabCommand, HandleCloseTabCommand));
         }
 
         public bool IsSelected
         {
             get { return (bool)GetValue(IsSelectedProperty); }
             set { SetValue(IsSelectedProperty, value); }
+        }
+
+        private void Close()
+        {
+            ParentTabControl.RemoveTab(this);
         }
 
         private void HandleMouseMove(object sender, MouseEventArgs e)
@@ -98,6 +110,13 @@ namespace ChromiumTabs
                 ParentTabControl.ChangeSelectedItem(this);
             }
             this.hasButtonDown = false;
+        }
+
+        private static void HandleCloseTabCommand(object sender, ExecutedRoutedEventArgs args)
+        {
+            ChromiumTabItem item = sender as ChromiumTabItem;
+            if (item == null) { return; }
+            item.Close();
         }
 
         private ChromiumTabControl ParentTabControl
