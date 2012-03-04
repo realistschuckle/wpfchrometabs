@@ -33,5 +33,10 @@ namespace ChromiumTabsRunner
         {
             this.chrometabs.AddTab(new Button { Content = "MOO!" }, true);
         }
+
+        private void HandleRemoveTab(object sender, RoutedEventArgs e)
+        {
+            this.chrometabs.RemoveTab(this.chrometabs.SelectedItem);
+        }
     }
 }

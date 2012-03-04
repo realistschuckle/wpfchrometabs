@@ -24,6 +24,7 @@
             <Button>Hello</Button>
         </my:ChromiumTabControl>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button Click="HandleRemoveTab" Margin="2">Close Selected Tab</Button>
             <Button Click="HandleAddTab" Margin="2">Add Tab</Button>
             <Button Click="HandleAddTabAndSelect" Margin="2">Add Tab And Select</Button>
         </StackPanel>
