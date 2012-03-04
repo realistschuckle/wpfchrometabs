@@ -23,5 +23,15 @@ namespace ChromiumTabsRunner
         {
             InitializeComponent();
         }
+
+        private void HandleAddTab(object sender, RoutedEventArgs e)
+        {
+            this.chrometabs.AddTab(new Button { Content = "MOO!" }, false);
+        }
+
+        private void HandleAddTabAndSelect(object sender, RoutedEventArgs e)
+        {
+            this.chrometabs.AddTab(new Button { Content = "MOO!" }, true);
+        }
     }
 }

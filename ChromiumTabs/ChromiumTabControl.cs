@@ -88,7 +88,16 @@ namespace ChromiumTabs
             }
         }
 
-        internal void RemoveTab(object tab)
+        public void AddTab(object tab, bool select)
+        {
+            this.Items.Add(tab);
+            if (select || this.Items.Count == 1)
+            {
+                this.SelectedIndex = this.Items.Count - 1;
+            }
+        }
+
+        public void RemoveTab(object tab)
         {
             int selectedIndex = this.SelectedIndex;
             bool removedSelectedTab = false;

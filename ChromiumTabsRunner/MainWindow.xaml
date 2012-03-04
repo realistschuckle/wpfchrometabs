@@ -4,14 +4,18 @@
         xmlns:my="clr-namespace:ChromiumTabs;assembly=ChromiumTabs"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <my:ChromiumTabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <my:ChromiumTabControl Name="chrometabs">
             <my:ChromiumTabItem Header="One" Background="Orange">
                 <Button>Uno</Button>
             </my:ChromiumTabItem>
             <my:ChromiumTabItem Header="Two" Background="Green">
                 <Label>Dos</Label>
             </my:ChromiumTabItem>
-            <my:ChromiumTabItem Header="Three" Background="Green" IsSelected="True">
+            <my:ChromiumTabItem Header="Three" Background="Green">
                 <Label>Tres</Label>
             </my:ChromiumTabItem>
             <my:ChromiumTabItem Header="Four" Background="Green">
@@ -19,5 +23,9 @@
             </my:ChromiumTabItem>
             <Button>Hello</Button>
         </my:ChromiumTabControl>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button Click="HandleAddTab" Margin="2">Add Tab</Button>
+            <Button Click="HandleAddTabAndSelect" Margin="2">Add Tab And Select</Button>
+        </StackPanel>
     </Grid>
 </Window>
