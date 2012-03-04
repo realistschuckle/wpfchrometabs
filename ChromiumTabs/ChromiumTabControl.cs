@@ -82,7 +82,7 @@ namespace ChromiumTabs
 
         protected override DependencyObject GetContainerForItemOverride()
         {
-            return new ChromiumTabItem();
+            return new ChromiumTabItem{ Header = "New Tab" };
         }
 
         private void SetChildrenZ()

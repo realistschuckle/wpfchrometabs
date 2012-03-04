@@ -46,7 +46,7 @@ namespace ChromiumTabs
     /// </summary>
     public class ChromiumTabItem : HeaderedContentControl
     {
-        public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromiumTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromiumTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
 
         static ChromiumTabItem()
         {
@@ -61,7 +61,6 @@ namespace ChromiumTabs
 
         private void HandleMouseMove(object sender, MouseEventArgs e)
         {
-            ParentTabControl.MouseMove -= HandleMouseMove;
             if (this.hasButtonDown)
             {
                 Point nowPoint = e.GetPosition(ParentTabControl);
@@ -72,15 +71,18 @@ namespace ChromiumTabs
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            downPoint = e.GetPosition(ParentTabControl);
+            this.downPoint = e.GetPosition(ParentTabControl);
             this.hasButtonDown = true;
             ParentTabControl.PreviewMouseMove += HandleMouseMove;
             ParentTabControl.PreviewMouseLeftButtonUp += HandleMouseUp;
+            e.Handled = true;
             base.OnMouseLeftButtonDown(e);
         }
 
         private void HandleMouseUp(object sender, MouseButtonEventArgs e)
         {
+            ParentTabControl.MouseMove -= HandleMouseMove;
+            ParentTabControl.PreviewMouseLeftButtonUp -= HandleMouseUp;
             if (this.hasButtonDown && !this.IsSelected)
             {
                 ParentTabControl.SelectedItem = this;

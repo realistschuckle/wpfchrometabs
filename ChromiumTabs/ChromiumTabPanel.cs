@@ -50,6 +50,15 @@ namespace ChromiumTabs
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromiumTabPanel), new FrameworkPropertyMetadata(typeof(ChromiumTabPanel)));
         }
 
+        public ChromiumTabPanel()
+        {
+            this.maxTabWidth = 100.0;
+            this.minTabWidth = 50.0;
+            this.leftMargin = 50.0;
+            this.rightMargin = 0.0;
+            this.overlap = 10.0;
+        }
+
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
@@ -63,20 +72,17 @@ namespace ChromiumTabs
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+            double activeWidth = finalSize.Width - this.leftMargin - this.rightMargin;
+            double tabWidth = Math.Min(Math.Max(activeWidth / this.Children.Count, this.minTabWidth), this.maxTabWidth);
             this.finalSize = finalSize;
-            double offset = 0.0;
+            double offset = leftMargin;
             foreach (UIElement element in this.Children)
             {
                 double thickness = 0.0;
-                double leftOffset = 0.0;
-                Control c = element as Control;
-                if(c != null)
-                {
-                    thickness = c.Margin.Bottom;
-                    leftOffset = c.Margin.Left;
-                }
-                element.Arrange(new Rect(offset - leftOffset, 0, 100, finalSize.Height - thickness));
-                offset += 90;
+                ChromiumTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, element) as ChromiumTabItem;
+                thickness = item.Margin.Bottom;
+                element.Arrange(new Rect(offset, 0, tabWidth, finalSize.Height - thickness));
+                offset += tabWidth - overlap;
             }
             return finalSize;
         }
@@ -86,6 +92,16 @@ namespace ChromiumTabs
             return base.MeasureOverride(availableSize);
         }
 
+        private ChromiumTabControl ParentTabControl
+        {
+            get { return Parent as ChromiumTabControl; }
+        }
+
         private Size finalSize;
+        private double overlap;
+        private double leftMargin;
+        private double rightMargin;
+        private double maxTabWidth;
+        private double minTabWidth;
     }
 }

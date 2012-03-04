@@ -17,6 +17,7 @@
             <my:ChromiumTabItem Header="Four" Background="Green">
                 <Label>Quattro</Label>
             </my:ChromiumTabItem>
+            <Button>Hello</Button>
         </my:ChromiumTabControl>
     </Grid>
 </Window>
