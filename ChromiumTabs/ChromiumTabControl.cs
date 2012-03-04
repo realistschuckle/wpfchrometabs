@@ -54,10 +54,38 @@ namespace ChromiumTabs
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromiumTabControl), new FrameworkPropertyMetadata(typeof(ChromiumTabControl)));
         }
 
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            bool somethingSelected = false;
+            foreach (UIElement element in this.Items)
+            {
+                somethingSelected |= ChromiumTabItem.GetIsSelected(element);
+            }
+            if (!somethingSelected)
+            {
+                this.SelectedIndex = 0;
+            }
+        }
+
         public object SelectedContent
         {
             get { return (object)GetValue(SelectedContentProperty); }
             set { SetValue(SelectedContentProperty, value); }
+        }
+
+        public void ChangeSelectedItem(ChromiumTabItem item)
+        {
+            for (int i = 0; i < this.Items.Count; i += 1)
+            {
+                object dep = this.Items[i];
+                ChromiumTabItem tabItem = this.AsTabItem(dep);
+                if (tabItem == item)
+                {
+                    this.SelectedIndex = i;
+                    return;
+                }
+            }
         }
 
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
@@ -70,8 +98,13 @@ namespace ChromiumTabs
         {
             base.OnSelectionChanged(e);
             this.SetChildrenZ();
-            if (this.SelectedItem == null) { return; }
-            ChromiumTabItem item = this.SelectedItem as ChromiumTabItem;
+            if (e.AddedItems.Count == 0) { return; }
+            foreach(UIElement element in this.Items)
+            {
+                if(element == e.AddedItems[0]) { continue; }
+                ChromiumTabItem.SetIsSelected(element, false);
+            }
+            ChromiumTabItem item = this.AsTabItem(this.SelectedItem);
             this.SelectedContent = item.Content;
         }
 
@@ -85,22 +118,56 @@ namespace ChromiumTabs
             return new ChromiumTabItem{ Header = "New Tab" };
         }
 
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.PrepareContainerForItemOverride(element, item);
+            if (element != item)
+            {
+                ObjectToContainer[item] = element;
+            }
+        }
+
+        private Dictionary<object, DependencyObject> ObjectToContainer
+        {
+            get
+            {
+                if (objectToContainerMap == null)
+                {
+                    objectToContainerMap = new Dictionary<object, DependencyObject>();
+                }
+                return objectToContainerMap;
+            }
+        }
+
+        private ChromiumTabItem AsTabItem(object item)
+        {
+            ChromiumTabItem tabItem = item as ChromiumTabItem;
+            if (tabItem == null && this.ObjectToContainer.ContainsKey(item))
+            {
+                tabItem = this.ObjectToContainer[item] as ChromiumTabItem;
+            }
+            return tabItem;
+        }
+
         private void SetChildrenZ()
         {
             int zindex = this.Items.Count - 1;
-            foreach (UIElement element in this.Items)
+            foreach (object element in this.Items)
             {
-                if (element == null) { continue; }
-                if (Selector.GetIsSelected(element))
+                ChromiumTabItem tabItem = this.AsTabItem(element);
+                if (tabItem == null) { continue; }
+                if (ChromiumTabItem.GetIsSelected(tabItem))
                 {
-                    Panel.SetZIndex(element, this.Items.Count);
+                    Panel.SetZIndex(tabItem, this.Items.Count);
                 }
                 else
                 {
-                    Panel.SetZIndex(element, zindex);
+                    Panel.SetZIndex(tabItem, zindex);
                 }
                 zindex -= 1;
             }
         }
+
+        private Dictionary<object, DependencyObject> objectToContainerMap;
     }
 }

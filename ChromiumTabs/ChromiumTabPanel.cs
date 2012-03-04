@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace ChromiumTabs
 {
@@ -43,6 +44,7 @@ namespace ChromiumTabs
     ///     <MyNamespace:ChromiumTabPanel/>
     ///
     /// </summary>
+    [ToolboxItem(false)]
     public class ChromiumTabPanel : Panel
     {
         static ChromiumTabPanel()
@@ -57,13 +59,14 @@ namespace ChromiumTabs
             this.leftMargin = 50.0;
             this.rightMargin = 0.0;
             this.overlap = 10.0;
+            this.defaultMeasureHeight = 30.0;
         }
 
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            Point start = new Point(0, Math.Round(finalSize.Height));
-            Point end = new Point(finalSize.Width, Math.Round(finalSize.Height));
+            Point start = new Point(0, Math.Round(this.finalSize.Height));
+            Point end = new Point(this.finalSize.Width, Math.Round(this.finalSize.Height));
             Color penColor = (Color)ColorConverter.ConvertFromString("#FF999999");
             Brush brush = new SolidColorBrush(penColor);
             Pen pen = new Pen(brush, .5);
@@ -89,7 +92,18 @@ namespace ChromiumTabs
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            return base.MeasureOverride(availableSize);
+            double activeWidth = double.IsPositiveInfinity(availableSize.Width) ? 500 : availableSize.Width - this.leftMargin - this.rightMargin;
+            double tabWidth = Math.Min(Math.Max(activeWidth / this.Children.Count, this.minTabWidth), this.maxTabWidth);
+            double height = double.IsPositiveInfinity(availableSize.Height) ? this.defaultMeasureHeight : availableSize.Height;
+            Size resultSize = new Size(0, availableSize.Height);
+            foreach (UIElement child in this.Children)
+            {
+                ChromiumTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, child) as ChromiumTabItem;
+                Size tabSize = new Size(tabWidth, height - item.Margin.Bottom);
+                child.Measure(tabSize);
+                resultSize.Width += child.DesiredSize.Width - overlap;
+            }
+            return resultSize;
         }
 
         private ChromiumTabControl ParentTabControl
@@ -103,5 +117,6 @@ namespace ChromiumTabs
         private double rightMargin;
         private double maxTabWidth;
         private double minTabWidth;
+        private double defaultMeasureHeight;
     }
 }

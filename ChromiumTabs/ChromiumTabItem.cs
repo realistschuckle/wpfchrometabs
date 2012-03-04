@@ -48,6 +48,16 @@ namespace ChromiumTabs
     {
         public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromiumTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
 
+        public static void SetIsSelected(DependencyObject item, bool value)
+        {
+            item.SetValue(ChromiumTabItem.IsSelectedProperty, value);
+        }
+
+        public static bool GetIsSelected(DependencyObject item)
+        {
+            return (bool)item.GetValue(ChromiumTabItem.IsSelectedProperty);
+        }
+
         static ChromiumTabItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromiumTabItem), new FrameworkPropertyMetadata(typeof(ChromiumTabItem)));
@@ -85,7 +95,7 @@ namespace ChromiumTabs
             ParentTabControl.PreviewMouseLeftButtonUp -= HandleMouseUp;
             if (this.hasButtonDown && !this.IsSelected)
             {
-                ParentTabControl.SelectedItem = this;
+                ParentTabControl.ChangeSelectedItem(this);
             }
             this.hasButtonDown = false;
         }
