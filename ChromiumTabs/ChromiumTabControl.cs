@@ -91,6 +91,16 @@ namespace ChromiumTabs
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnItemsChanged(e);
+            if (e.OldItems != null)
+            {
+                foreach (object item in e.OldItems)
+                {
+                    if (ObjectToContainer.ContainsKey(item))
+                    {
+                        ObjectToContainer.Remove(item);
+                    }
+                }
+            }
             this.SetChildrenZ();
         }
 
