@@ -81,37 +81,6 @@ namespace ChromiumTabs
             ParentTabControl.RemoveTab(this);
         }
 
-        private void HandleMouseMove(object sender, MouseEventArgs e)
-        {
-            if (this.hasButtonDown)
-            {
-                Point nowPoint = e.GetPosition(ParentTabControl);
-                Thickness margin = new Thickness(nowPoint.X - downPoint.X, this.Margin.Top, downPoint.X - nowPoint.X, this.Margin.Bottom);
-                SetValue(FrameworkElement.MarginProperty, margin);
-            }
-        }
-
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-        {
-            this.downPoint = e.GetPosition(ParentTabControl);
-            this.hasButtonDown = true;
-            ParentTabControl.PreviewMouseMove += HandleMouseMove;
-            ParentTabControl.PreviewMouseLeftButtonUp += HandleMouseUp;
-            e.Handled = true;
-            base.OnMouseLeftButtonDown(e);
-        }
-
-        private void HandleMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            ParentTabControl.MouseMove -= HandleMouseMove;
-            ParentTabControl.PreviewMouseLeftButtonUp -= HandleMouseUp;
-            if (this.hasButtonDown && !this.IsSelected)
-            {
-                ParentTabControl.ChangeSelectedItem(this);
-            }
-            this.hasButtonDown = false;
-        }
-
         private static void HandleCloseTabCommand(object sender, ExecutedRoutedEventArgs args)
         {
             ChromiumTabItem item = sender as ChromiumTabItem;
@@ -123,8 +92,5 @@ namespace ChromiumTabs
         {
             get { return ItemsControl.ItemsControlFromItemContainer(this) as ChromiumTabControl; }
         }
-
-        private bool hasButtonDown;
-        private Point downPoint;
     }
 }

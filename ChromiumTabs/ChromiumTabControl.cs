@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 using System.Collections.Specialized;
+using System.Windows.Media.Animation;
 
 namespace ChromiumTabs
 {

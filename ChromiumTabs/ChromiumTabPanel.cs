@@ -106,9 +106,52 @@ namespace ChromiumTabs
             return resultSize;
         }
 
+        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseLeftButtonDown(e);
+            this.downPoint = e.GetPosition(this);
+            HitTestResult result = VisualTreeHelper.HitTest(this, this.downPoint);
+            if (result == null) { return; }
+            DependencyObject source = result.VisualHit;
+            while (source != null && !this.Children.Contains(source as UIElement))
+            {
+                source = VisualTreeHelper.GetParent(source);
+            }
+            if (source == null) { return; }
+            draggedTab = source as ChromiumTabItem;
+        }
+
+        protected override void OnPreviewMouseMove(MouseEventArgs e)
+        {
+            base.OnPreviewMouseMove(e);
+            if (draggedTab == null) { return; }
+            Point nowPoint = e.GetPosition(this);
+            Thickness margin = new Thickness(nowPoint.X - this.downPoint.X, 0, this.downPoint.X - nowPoint.X, 0);
+            draggedTab.SetValue(FrameworkElement.MarginProperty, margin);
+        }
+
+        protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseLeftButtonUp(e);
+            ParentTabControl.ChangeSelectedItem(draggedTab);
+            draggedTab = null;
+        }
+
         private ChromiumTabControl ParentTabControl
         {
-            get { return Parent as ChromiumTabControl; }
+            get
+            {
+                if (this.parent == null)
+                {
+                    DependencyObject parent = this;
+                    while (parent != null && !(parent is ChromiumTabControl))
+                    {
+                        parent = VisualTreeHelper.GetParent(parent);
+                    }
+                    this.parent = parent as ChromiumTabControl;
+                }
+                return this.parent;
+            }
         }
 
         private Size finalSize;
@@ -118,5 +161,8 @@ namespace ChromiumTabs
         private double maxTabWidth;
         private double minTabWidth;
         private double defaultMeasureHeight;
+        private ChromiumTabItem draggedTab;
+        private Point downPoint;
+        private ChromiumTabControl parent;
     }
 }
