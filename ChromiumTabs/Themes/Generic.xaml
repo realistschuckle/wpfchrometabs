@@ -1,7 +1,41 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:ChromiumTabs">
+    xmlns:local="clr-namespace:ChromiumTabs"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <Style TargetType="{x:Type Button}" x:Key="CloseButtonStyle">
+        <Style.Resources>
+            <sys:Double x:Key="CloseButtonWidth">6</sys:Double>
+            <sys:Double x:Key="CloseCircleWidth">12</sys:Double>
+            <sys:Double x:Key="CloseButtonOffset">3</sys:Double>
+        </Style.Resources>
+        <Setter Property="Height" Value="{StaticResource CloseCircleWidth}" />
+        <Setter Property="Width" Value="{StaticResource CloseCircleWidth}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="DarkGray" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Canvas Background="Transparent" x:Name="CloseButton" Width="{StaticResource CloseCircleWidth}" Height="{StaticResource CloseCircleWidth}">
+                        <Ellipse Width="{StaticResource CloseCircleWidth}" Fill="{TemplateBinding Background}" Height="{StaticResource CloseCircleWidth}" />
+                        <Canvas Canvas.Left="{StaticResource CloseButtonOffset}" Canvas.Top="{StaticResource CloseButtonOffset}" Background="Transparent" Width="{StaticResource CloseButtonWidth}" Height="{StaticResource CloseButtonWidth}">
+                            <Line X1="0" Y1="0" X2="{StaticResource CloseButtonWidth}" Y2="{StaticResource CloseButtonWidth}" Stroke="{TemplateBinding Foreground}" StrokeThickness="2" />
+                            <Line X1="0" Y1="{StaticResource CloseButtonWidth}" X2="{StaticResource CloseButtonWidth}" Y2="0" Stroke="{TemplateBinding Foreground}" StrokeThickness="2" />
+                        </Canvas>
+                    </Canvas>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="DarkGray" />
+                <Setter Property="Foreground" Value="White" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="{x:Type local:ChromiumTabControl}">
         <Setter Property="Template">
             <Setter.Value>
@@ -60,7 +94,7 @@
                             </Path.RenderTransform>
                         </Path>
                         <Label VerticalAlignment="Center" Content="{TemplateBinding Header}" Grid.Column="1" />
-                        <Label VerticalAlignment="Center" Grid.Column="2">X</Label>
+                        <Button Style="{StaticResource CloseButtonStyle}" Grid.Column="2" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
