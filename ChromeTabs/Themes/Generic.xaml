@@ -80,10 +80,10 @@
                 <ControlTemplate TargetType="{x:Type local:ChromeTabItem}">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="15" />
+                            <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="20" />
-                            <ColumnDefinition Width="15" />
+                            <ColumnDefinition Width="5" />
                         </Grid.ColumnDefinitions>
                         <Path Name="TabFill" Margin="0 0 0 1" Grid.ColumnSpan="4" VerticalAlignment="Top" Stretch="Fill" Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96">
                             <Path.Fill>
@@ -105,8 +105,8 @@
                                 </TransformGroup>
                             </Path.RenderTransform>
                         </Path>
-                        <Label VerticalAlignment="Center" Content="{TemplateBinding Header}" Grid.Column="1" />
-                        <Button Style="{StaticResource CloseButtonStyle}" Grid.Column="2" Command="{x:Static local:ChromeTabItem.CloseTabCommand}" />
+                        <Label Margin="10 0 0 0" VerticalAlignment="Center" Content="{TemplateBinding Header}" Grid.Column="1" />
+                        <Button Margin="0 0 10 0" Style="{StaticResource CloseButtonStyle}" Grid.Column="2" Command="{x:Static local:ChromeTabItem.CloseTabCommand}" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
