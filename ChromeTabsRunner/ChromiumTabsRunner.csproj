@@ -92,6 +92,12 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChromeTabs\ChromeTabs.csproj">
+      <Project>{0208352A-D75A-44B1-9C21-AA54D64D24B6}</Project>
+      <Name>ChromeTabs</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

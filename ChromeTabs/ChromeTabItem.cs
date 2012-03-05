@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 
-namespace ChromiumTabs
+namespace ChromeTabs
 {
     /// <summary>
     /// Follow steps 1a or 1b and then 2 to use this custom control in a XAML file.
@@ -44,10 +44,10 @@ namespace ChromiumTabs
     ///     <MyNamespace:ChromiumTabItem/>
     ///
     /// </summary>
-    public class ChromiumTabItem : HeaderedContentControl
+    public class ChromeTabItem : HeaderedContentControl
     {
-        public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromiumTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
-        private static readonly RoutedUICommand closeTabCommand = new RoutedUICommand("Close tab", "CloseTab", typeof(ChromiumTabItem));
+        public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromeTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
+        private static readonly RoutedUICommand closeTabCommand = new RoutedUICommand("Close tab", "CloseTab", typeof(ChromeTabItem));
 
         public static RoutedUICommand CloseTabCommand
         {
@@ -56,18 +56,18 @@ namespace ChromiumTabs
 
         public static void SetIsSelected(DependencyObject item, bool value)
         {
-            item.SetValue(ChromiumTabItem.IsSelectedProperty, value);
+            item.SetValue(ChromeTabItem.IsSelectedProperty, value);
         }
 
         public static bool GetIsSelected(DependencyObject item)
         {
-            return (bool)item.GetValue(ChromiumTabItem.IsSelectedProperty);
+            return (bool)item.GetValue(ChromeTabItem.IsSelectedProperty);
         }
 
-        static ChromiumTabItem()
+        static ChromeTabItem()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromiumTabItem), new FrameworkPropertyMetadata(typeof(ChromiumTabItem)));
-            CommandManager.RegisterClassCommandBinding(typeof(ChromiumTabItem), new CommandBinding(closeTabCommand, HandleCloseTabCommand));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabItem), new FrameworkPropertyMetadata(typeof(ChromeTabItem)));
+            CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeTabCommand, HandleCloseTabCommand));
         }
 
         public bool IsSelected
@@ -83,14 +83,14 @@ namespace ChromiumTabs
 
         private static void HandleCloseTabCommand(object sender, ExecutedRoutedEventArgs args)
         {
-            ChromiumTabItem item = sender as ChromiumTabItem;
+            ChromeTabItem item = sender as ChromeTabItem;
             if (item == null) { return; }
             item.Close();
         }
 
-        private ChromiumTabControl ParentTabControl
+        private ChromeTabControl ParentTabControl
         {
-            get { return ItemsControl.ItemsControlFromItemContainer(this) as ChromiumTabControl; }
+            get { return ItemsControl.ItemsControlFromItemContainer(this) as ChromeTabControl; }
         }
     }
 }

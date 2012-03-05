@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 
-namespace ChromiumTabs
+namespace ChromeTabs
 {
     /// <summary>
     /// Follow steps 1a or 1b and then 2 to use this custom control in a XAML file.
@@ -45,14 +45,14 @@ namespace ChromiumTabs
     ///
     /// </summary>
     [ToolboxItem(false)]
-    public class ChromiumTabPanel : Panel
+    public class ChromeTabPanel : Panel
     {
-        static ChromiumTabPanel()
+        static ChromeTabPanel()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromiumTabPanel), new FrameworkPropertyMetadata(typeof(ChromiumTabPanel)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabPanel), new FrameworkPropertyMetadata(typeof(ChromeTabPanel)));
         }
 
-        public ChromiumTabPanel()
+        public ChromeTabPanel()
         {
             this.maxTabWidth = 100.0;
             this.minTabWidth = 50.0;
@@ -82,7 +82,7 @@ namespace ChromiumTabs
             foreach (UIElement element in this.Children)
             {
                 double thickness = 0.0;
-                ChromiumTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, element) as ChromiumTabItem;
+                ChromeTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, element) as ChromeTabItem;
                 thickness = item.Margin.Bottom;
                 element.Arrange(new Rect(offset, 0, tabWidth, finalSize.Height - thickness));
                 offset += tabWidth - overlap;
@@ -98,7 +98,7 @@ namespace ChromiumTabs
             Size resultSize = new Size(0, availableSize.Height);
             foreach (UIElement child in this.Children)
             {
-                ChromiumTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, child) as ChromiumTabItem;
+                ChromeTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, child) as ChromeTabItem;
                 Size tabSize = new Size(tabWidth, height - item.Margin.Bottom);
                 child.Measure(tabSize);
                 resultSize.Width += child.DesiredSize.Width - overlap;
@@ -118,7 +118,7 @@ namespace ChromiumTabs
                 source = VisualTreeHelper.GetParent(source);
             }
             if (source == null) { return; }
-            draggedTab = source as ChromiumTabItem;
+            draggedTab = source as ChromeTabItem;
         }
 
         protected override void OnPreviewMouseMove(MouseEventArgs e)
@@ -137,18 +137,18 @@ namespace ChromiumTabs
             draggedTab = null;
         }
 
-        private ChromiumTabControl ParentTabControl
+        private ChromeTabControl ParentTabControl
         {
             get
             {
                 if (this.parent == null)
                 {
                     DependencyObject parent = this;
-                    while (parent != null && !(parent is ChromiumTabControl))
+                    while (parent != null && !(parent is ChromeTabControl))
                     {
                         parent = VisualTreeHelper.GetParent(parent);
                     }
-                    this.parent = parent as ChromiumTabControl;
+                    this.parent = parent as ChromeTabControl;
                 }
                 return this.parent;
             }
@@ -161,8 +161,8 @@ namespace ChromiumTabs
         private double maxTabWidth;
         private double minTabWidth;
         private double defaultMeasureHeight;
-        private ChromiumTabItem draggedTab;
+        private ChromeTabItem draggedTab;
         private Point downPoint;
-        private ChromiumTabControl parent;
+        private ChromeTabControl parent;
     }
 }

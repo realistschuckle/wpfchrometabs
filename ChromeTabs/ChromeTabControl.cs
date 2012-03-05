@@ -15,7 +15,7 @@ using System.Windows.Controls.Primitives;
 using System.Collections.Specialized;
 using System.Windows.Media.Animation;
 
-namespace ChromiumTabs
+namespace ChromeTabs
 {
     /// <summary>
     /// Follow steps 1a or 1b and then 2 to use this custom control in a XAML file.
@@ -46,13 +46,13 @@ namespace ChromiumTabs
     ///     <MyNamespace:CustomControl1/>
     ///
     /// </summary>
-    public class ChromiumTabControl : Selector
+    public class ChromeTabControl : Selector
     {
-        public static readonly DependencyProperty SelectedContentProperty = DependencyProperty.Register("SelectedContent", typeof(object), typeof(ChromiumTabControl), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty SelectedContentProperty = DependencyProperty.Register("SelectedContent", typeof(object), typeof(ChromeTabControl), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
-        static ChromiumTabControl()
+        static ChromeTabControl()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromiumTabControl), new FrameworkPropertyMetadata(typeof(ChromiumTabControl)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -61,7 +61,7 @@ namespace ChromiumTabs
             bool somethingSelected = false;
             foreach (UIElement element in this.Items)
             {
-                somethingSelected |= ChromiumTabItem.GetIsSelected(element);
+                somethingSelected |= ChromeTabItem.GetIsSelected(element);
             }
             if (!somethingSelected)
             {
@@ -75,12 +75,12 @@ namespace ChromiumTabs
             set { SetValue(SelectedContentProperty, value); }
         }
 
-        internal void ChangeSelectedItem(ChromiumTabItem item)
+        internal void ChangeSelectedItem(ChromeTabItem item)
         {
             for (int i = 0; i < this.Items.Count; i += 1)
             {
                 object dep = this.Items[i];
-                ChromiumTabItem tabItem = this.AsTabItem(dep);
+                ChromeTabItem tabItem = this.AsTabItem(dep);
                 if (tabItem == item)
                 {
                     this.SelectedIndex = i;
@@ -102,10 +102,10 @@ namespace ChromiumTabs
         {
             int selectedIndex = this.SelectedIndex;
             bool removedSelectedTab = false;
-            ChromiumTabItem removeItem = this.AsTabItem(tab);
+            ChromeTabItem removeItem = this.AsTabItem(tab);
             foreach (object item in this.Items)
             {
-                ChromiumTabItem tabItem = this.AsTabItem(item);
+                ChromeTabItem tabItem = this.AsTabItem(item);
                 if (tabItem != null && tabItem == removeItem)
                 {
                     if (tabItem.Content == this.SelectedContent)
@@ -155,20 +155,20 @@ namespace ChromiumTabs
             foreach(UIElement element in this.Items)
             {
                 if(element == e.AddedItems[0]) { continue; }
-                ChromiumTabItem.SetIsSelected(element, false);
+                ChromeTabItem.SetIsSelected(element, false);
             }
-            ChromiumTabItem item = this.AsTabItem(this.SelectedItem);
+            ChromeTabItem item = this.AsTabItem(this.SelectedItem);
             this.SelectedContent = item != null? item.Content : null;
         }
 
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
-            return (item is ChromiumTabItem);
+            return (item is ChromeTabItem);
         }
 
         protected override DependencyObject GetContainerForItemOverride()
         {
-            return new ChromiumTabItem{ Header = "New Tab" };
+            return new ChromeTabItem{ Header = "New Tab" };
         }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
@@ -192,12 +192,12 @@ namespace ChromiumTabs
             }
         }
 
-        private ChromiumTabItem AsTabItem(object item)
+        private ChromeTabItem AsTabItem(object item)
         {
-            ChromiumTabItem tabItem = item as ChromiumTabItem;
+            ChromeTabItem tabItem = item as ChromeTabItem;
             if (tabItem == null && this.ObjectToContainer.ContainsKey(item))
             {
-                tabItem = this.ObjectToContainer[item] as ChromiumTabItem;
+                tabItem = this.ObjectToContainer[item] as ChromeTabItem;
             }
             return tabItem;
         }
@@ -207,9 +207,9 @@ namespace ChromiumTabs
             int zindex = this.Items.Count - 1;
             foreach (object element in this.Items)
             {
-                ChromiumTabItem tabItem = this.AsTabItem(element);
+                ChromeTabItem tabItem = this.AsTabItem(element);
                 if (tabItem == null) { continue; }
-                if (ChromiumTabItem.GetIsSelected(tabItem))
+                if (ChromeTabItem.GetIsSelected(tabItem))
                 {
                     Panel.SetZIndex(tabItem, this.Items.Count);
                 }
