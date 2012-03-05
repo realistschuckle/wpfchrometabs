@@ -3,6 +3,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:ChromeTabs"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:ChromeTabPanel}, ResourceId=addButtonStyle}" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid SnapsToDevicePixels="True">
+                        <Path Fill="{TemplateBinding Background}" Stretch="Fill" Stroke="#FF999999" Data="M36.904667,19.333333 C42.238,19.25 36.238,0.5 34.863116,0.5 23.863116,0.5 19.613032,0.5 2.8630319,0.5 -3.2202511,0.5 4.0712139,19.416667 6.5711261,19.416667 15.593514,19.416667 28.609259,19.462949 36.904667,19.333333 z" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style TargetType="{x:Type Button}" x:Key="CloseButtonStyle">
         <Style.Resources>
             <sys:Double x:Key="CloseButtonWidth">6</sys:Double>
