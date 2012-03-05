@@ -54,26 +54,22 @@ namespace ChromeTabs
 
         public ChromeTabPanel()
         {
-            this.maxTabWidth = 100.0;
-            this.minTabWidth = 50.0;
+            this.maxTabWidth = 125.0;
+            this.minTabWidth = 30.0;
             this.leftMargin = 50.0;
             this.rightMargin = 0.0;
             this.overlap = 10.0;
             this.defaultMeasureHeight = 30.0;
-            this.addButtonSize = new Size(20, 12);
 
             ComponentResourceKey key = new ComponentResourceKey(typeof(ChromeTabPanel), "addButtonStyle");
             Style addButtonStyle = (Style)this.FindResource(key);
-
             this.addButton = new Button { Style = addButtonStyle };
+            this.addButtonSize = new Size(20, 12);
         }
 
         protected override int VisualChildrenCount
         {
-            get
-            {
-                return base.VisualChildrenCount + 1;
-            }
+            get { return base.VisualChildrenCount + 1; }
         }
 
         protected override Visual GetVisualChild(int index)
@@ -140,6 +136,13 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
+            if (this.addButtonRect.Contains(e.GetPosition(this)))
+            {
+                this.addButton.Background = Brushes.DarkGray;
+                this.InvalidateVisual();
+                return;
+            }
+
             this.downPoint = e.GetPosition(this);
             HitTestResult result = VisualTreeHelper.HitTest(this, this.downPoint);
             if (result == null) { return; }
@@ -155,7 +158,7 @@ namespace ChromeTabs
         protected override void OnPreviewMouseMove(MouseEventArgs e)
         {
             base.OnPreviewMouseMove(e);
-            if (this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background != Brushes.White)
+            if (this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background != Brushes.White && this.addButton.Background != Brushes.DarkGray)
             {
                 this.addButton.Background = Brushes.White;
                 this.InvalidateVisual();
@@ -174,6 +177,14 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonUp(e);
+            if (this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background == Brushes.DarkGray)
+            {
+                this.addButton.Background = null;
+                this.InvalidateVisual();
+                ParentTabControl.AddTab(new Label(), true); // HACK: Do something with default templates, here.
+                return;
+            }
+
             ParentTabControl.ChangeSelectedItem(draggedTab);
             draggedTab = null;
         }
