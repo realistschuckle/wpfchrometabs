@@ -195,7 +195,7 @@ namespace ChromeTabs
         private ChromeTabItem AsTabItem(object item)
         {
             ChromeTabItem tabItem = item as ChromeTabItem;
-            if (tabItem == null && this.ObjectToContainer.ContainsKey(item))
+            if (tabItem == null && item != null && this.ObjectToContainer.ContainsKey(item))
             {
                 tabItem = this.ObjectToContainer[item] as ChromeTabItem;
             }
