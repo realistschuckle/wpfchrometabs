@@ -99,7 +99,9 @@ namespace ChromeTabs
         protected override Size ArrangeOverride(Size finalSize)
         {
             double activeWidth = finalSize.Width - this.leftMargin - this.rightMargin;
-            double tabWidth = Math.Min(Math.Max((activeWidth + (this.Children.Count - 1) * overlap)/ this.Children.Count, this.minTabWidth), this.maxTabWidth);
+            this.currentTabWidth = Math.Min(Math.Max((activeWidth + (this.Children.Count - 1) * overlap)/ this.Children.Count, this.minTabWidth), this.maxTabWidth);
+            ParentTabControl.SetCanAddTab(this.currentTabWidth > this.minTabWidth);
+            this.addButton.Visibility = this.currentTabWidth > this.minTabWidth ? Visibility.Visible : Visibility.Collapsed;
             this.finalSize = finalSize;
             double offset = leftMargin;
             foreach (UIElement element in this.Children)
@@ -107,8 +109,8 @@ namespace ChromeTabs
                 double thickness = 0.0;
                 ChromeTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, element) as ChromeTabItem;
                 thickness = item.Margin.Bottom;
-                element.Arrange(new Rect(offset, 0, tabWidth, finalSize.Height - thickness));
-                offset += tabWidth - overlap;
+                element.Arrange(new Rect(offset, 0, this.currentTabWidth, finalSize.Height - thickness));
+                offset += this.currentTabWidth - overlap;
             }
             this.addButtonRect = new Rect(new Point(offset + overlap, (finalSize.Height - this.addButtonSize.Height) / 2), this.addButtonSize);
             this.addButton.Arrange(this.addButtonRect);
@@ -118,13 +120,15 @@ namespace ChromeTabs
         protected override Size MeasureOverride(Size availableSize)
         {
             double activeWidth = double.IsPositiveInfinity(availableSize.Width) ? 500 : availableSize.Width - this.leftMargin - this.rightMargin;
-            double tabWidth = Math.Min(Math.Max((activeWidth + (this.Children.Count - 1) * overlap) / this.Children.Count, this.minTabWidth), this.maxTabWidth);
+            this.currentTabWidth = Math.Min(Math.Max((activeWidth + (this.Children.Count - 1) * overlap) / this.Children.Count, this.minTabWidth), this.maxTabWidth);
+            ParentTabControl.SetCanAddTab(this.currentTabWidth > this.minTabWidth);
+            this.addButton.Visibility = this.currentTabWidth > this.minTabWidth ? Visibility.Visible : Visibility.Collapsed;
             double height = double.IsPositiveInfinity(availableSize.Height) ? this.defaultMeasureHeight : availableSize.Height;
             Size resultSize = new Size(0, availableSize.Height);
             foreach (UIElement child in this.Children)
             {
                 ChromeTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, child) as ChromeTabItem;
-                Size tabSize = new Size(tabWidth, height - item.Margin.Bottom);
+                Size tabSize = new Size(this.currentTabWidth, height - item.Margin.Bottom);
                 child.Measure(tabSize);
                 resultSize.Width += child.DesiredSize.Width - overlap;
             }
@@ -136,7 +140,7 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
-            if (this.addButtonRect.Contains(e.GetPosition(this)))
+            if(this.addButtonRect.Contains(e.GetPosition(this)))
             {
                 this.addButton.Background = Brushes.DarkGray;
                 this.InvalidateVisual();
@@ -177,11 +181,14 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonUp(e);
-            if (this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background == Brushes.DarkGray)
+            if(this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background == Brushes.DarkGray)
             {
                 this.addButton.Background = null;
                 this.InvalidateVisual();
-                ParentTabControl.AddTab(new Label(), true); // HACK: Do something with default templates, here.
+                if(this.addButton.Visibility == Visibility.Visible)
+                {
+                    ParentTabControl.AddTab(new Label(), true); // HACK: Do something with default templates, here.
+                }
                 return;
             }
 
@@ -213,6 +220,7 @@ namespace ChromeTabs
         private double maxTabWidth;
         private double minTabWidth;
         private double defaultMeasureHeight;
+        private double currentTabWidth;
         private ChromeTabItem draggedTab;
         private Point downPoint;
         private ChromeTabControl parent;

@@ -48,6 +48,8 @@ namespace ChromeTabs
     /// </summary>
     public class ChromeTabControl : Selector
     {
+        internal static readonly DependencyPropertyKey CanAddTabPropertyKey = DependencyProperty.RegisterReadOnly("CanAddTab", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
+        public static readonly DependencyProperty CanAddTabProperty = CanAddTabPropertyKey.DependencyProperty;
         public static readonly DependencyProperty SelectedContentProperty = DependencyProperty.Register("SelectedContent", typeof(object), typeof(ChromeTabControl), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
         static ChromeTabControl()
@@ -89,8 +91,22 @@ namespace ChromeTabs
             }
         }
 
+        public bool CanAddTab
+        {
+            get { return (bool)GetValue(CanAddTabProperty); }
+        }
+
+        internal void SetCanAddTab(bool value)
+        {
+            SetValue(CanAddTabPropertyKey, value);
+        }
+
         public void AddTab(object tab, bool select)
         {
+            if(!CanAddTab)
+            {
+                return;
+            }
             this.Items.Add(tab);
             if (select || this.Items.Count == 1)
             {
