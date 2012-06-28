@@ -85,7 +85,9 @@ namespace ChromeTabs
                 ChromeTabItem tabItem = this.AsTabItem(dep);
                 if (tabItem == item)
                 {
+                    Canvas.SetZIndex(this.AsTabItem(this.SelectedItem), 0);
                     this.SelectedIndex = i;
+                    Canvas.SetZIndex(tabItem, 1001);
                     return;
                 }
             }

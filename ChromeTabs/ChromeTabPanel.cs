@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.Windows.Media.Animation;
 
 namespace ChromeTabs
 {
@@ -151,12 +152,16 @@ namespace ChromeTabs
             HitTestResult result = VisualTreeHelper.HitTest(this, this.downPoint);
             if (result == null) { return; }
             DependencyObject source = result.VisualHit;
-            while (source != null && !this.Children.Contains(source as UIElement))
+            while(source != null && !this.Children.Contains(source as UIElement))
             {
                 source = VisualTreeHelper.GetParent(source);
             }
-            if (source == null) { return; }
+            if(source == null) { return; }
             draggedTab = source as ChromeTabItem;
+            if(draggedTab != null)
+            {
+                Canvas.SetZIndex(draggedTab, 1000);
+            }
         }
 
         protected override void OnPreviewMouseMove(MouseEventArgs e)
@@ -175,7 +180,8 @@ namespace ChromeTabs
             if (draggedTab == null) { return; }
             Point nowPoint = e.GetPosition(this);
             Thickness margin = new Thickness(nowPoint.X - this.downPoint.X, 0, this.downPoint.X - nowPoint.X, 0);
-            draggedTab.SetValue(FrameworkElement.MarginProperty, margin);
+            draggedTab.Margin = margin;
+            //draggedTab.SetValue(FrameworkElement.MarginProperty, margin);
         }
 
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -192,8 +198,28 @@ namespace ChromeTabs
                 return;
             }
 
-            ParentTabControl.ChangeSelectedItem(draggedTab);
-            draggedTab = null;
+            if(draggedTab == null)
+            {
+                return;
+            }
+            ThicknessAnimation moveBackAnimation = new ThicknessAnimation(draggedTab.Margin, new Thickness(0), new Duration(TimeSpan.FromSeconds(.1)));
+            Storyboard.SetTarget(moveBackAnimation, draggedTab);
+            Storyboard.SetTargetProperty(moveBackAnimation, new PropertyPath(FrameworkElement.MarginProperty));
+            Storyboard sb = new Storyboard();
+            sb.Children.Add(moveBackAnimation);
+            sb.Completed += (o, ea) =>
+            {
+                if(draggedTab == null)
+                {
+                    return;
+                }
+                Canvas.SetZIndex(draggedTab, 0);
+                draggedTab.Margin = new Thickness(0);
+                ParentTabControl.ChangeSelectedItem(draggedTab);
+                draggedTab = null;
+                sb.Remove();
+            };
+            sb.Begin();
         }
 
         private ChromeTabControl ParentTabControl
