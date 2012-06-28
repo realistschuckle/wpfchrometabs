@@ -55,9 +55,9 @@ namespace ChromeTabs
         public ChromeTabPanel()
         {
             this.maxTabWidth = 125.0;
-            this.minTabWidth = 30.0;
+            this.minTabWidth = 40.0;
             this.leftMargin = 50.0;
-            this.rightMargin = 0.0;
+            this.rightMargin = 30.0;
             this.overlap = 10.0;
             this.defaultMeasureHeight = 30.0;
 
@@ -99,7 +99,7 @@ namespace ChromeTabs
         protected override Size ArrangeOverride(Size finalSize)
         {
             double activeWidth = finalSize.Width - this.leftMargin - this.rightMargin;
-            double tabWidth = Math.Min(Math.Max(activeWidth / this.Children.Count, this.minTabWidth), this.maxTabWidth);
+            double tabWidth = Math.Min(Math.Max((activeWidth + (this.Children.Count - 1) * overlap)/ this.Children.Count, this.minTabWidth), this.maxTabWidth);
             this.finalSize = finalSize;
             double offset = leftMargin;
             foreach (UIElement element in this.Children)
@@ -118,7 +118,7 @@ namespace ChromeTabs
         protected override Size MeasureOverride(Size availableSize)
         {
             double activeWidth = double.IsPositiveInfinity(availableSize.Width) ? 500 : availableSize.Width - this.leftMargin - this.rightMargin;
-            double tabWidth = Math.Min(Math.Max(activeWidth / this.Children.Count, this.minTabWidth), this.maxTabWidth);
+            double tabWidth = Math.Min(Math.Max((activeWidth + (this.Children.Count - 1) * overlap) / this.Children.Count, this.minTabWidth), this.maxTabWidth);
             double height = double.IsPositiveInfinity(availableSize.Height) ? this.defaultMeasureHeight : availableSize.Height;
             Size resultSize = new Size(0, availableSize.Height);
             foreach (UIElement child in this.Children)
