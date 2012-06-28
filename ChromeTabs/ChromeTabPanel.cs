@@ -181,7 +181,6 @@ namespace ChromeTabs
             Point nowPoint = e.GetPosition(this);
             Thickness margin = new Thickness(nowPoint.X - this.downPoint.X, 0, this.downPoint.X - nowPoint.X, 0);
             draggedTab.Margin = margin;
-            //draggedTab.SetValue(FrameworkElement.MarginProperty, margin);
         }
 
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
