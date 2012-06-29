@@ -7,6 +7,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <my:ChromeTabControl Name="chrometabs">
             <my:ChromeTabItem Header="One" Background="Orange">
@@ -18,15 +19,19 @@
             <my:ChromeTabItem Header="Three" Background="Green">
                 <Label>Tres</Label>
             </my:ChromeTabItem>
+            <Button>Hello</Button>
             <my:ChromeTabItem Header="Four" Background="Green">
                 <Label>Quattro</Label>
             </my:ChromeTabItem>
-            <Button>Hello</Button>
         </my:ChromeTabControl>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button Click="HandleRemoveTab" Margin="2">Close Selected Tab</Button>
             <Button Click="HandleAddTab" Margin="2" IsEnabled="{Binding Path=CanAddTab, ElementName=chrometabs}">Add Tab</Button>
             <Button Click="HandleAddTabAndSelect" Margin="2" IsEnabled="{Binding Path=CanAddTab, ElementName=chrometabs}">Add Tab And Select</Button>
         </StackPanel>
+        <DockPanel LastChildFill="True" Grid.Row="2">
+            <Label DockPanel.Dock="Left">Title</Label>
+            <TextBox Name="title"></TextBox>
+        </DockPanel>
     </Grid>
 </Window>

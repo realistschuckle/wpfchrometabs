@@ -69,6 +69,7 @@ namespace ChromeTabs
             {
                 this.SelectedIndex = 0;
             }
+            KeyboardNavigation.SetIsTabStop(this, false);
         }
 
         public object SelectedContent
@@ -194,7 +195,8 @@ namespace ChromeTabs
             base.PrepareContainerForItemOverride(element, item);
             if (element != item)
             {
-                ObjectToContainer[item] = element;
+                this.ObjectToContainer[item] = element;
+                this.SetChildrenZ();
             }
         }
 

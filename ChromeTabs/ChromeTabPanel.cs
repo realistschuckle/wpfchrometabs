@@ -139,6 +139,18 @@ namespace ChromeTabs
             return resultSize;
         }
 
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            this.SetTabItemsOnTabs();
+        }
+
+        protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
+        {
+            base.OnVisualChildrenChanged(visualAdded, visualRemoved);
+            this.SetTabItemsOnTabs();
+        }
+
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
@@ -247,6 +259,19 @@ namespace ChromeTabs
                     this.parent = parent as ChromeTabControl;
                 }
                 return this.parent;
+            }
+        }
+
+        private void SetTabItemsOnTabs()
+        {
+            for(int i = 0; i < this.Children.Count; i += 1)
+            {
+                DependencyObject depObj = this.Children[i] as DependencyObject;
+                ChromeTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, depObj) as ChromeTabItem;
+                if(item != null)
+                {
+                    KeyboardNavigation.SetTabIndex(item, i);
+                }
             }
         }
 
