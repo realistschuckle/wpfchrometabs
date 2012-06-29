@@ -273,6 +273,10 @@ namespace ChromeTabs
             for(int i = 0; i < this.Children.Count; i += 1)
             {
                 DependencyObject depObj = this.Children[i] as DependencyObject;
+                if(depObj == null)
+                {
+                    continue;
+                }
                 ChromeTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, depObj) as ChromeTabItem;
                 if(item != null)
                 {
