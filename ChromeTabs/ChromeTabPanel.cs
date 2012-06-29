@@ -196,18 +196,18 @@ namespace ChromeTabs
             draggedTab.Margin = margin;
             if(margin.Left != 0)
             {
-                Interlocked.Increment(ref this.captureGuard);
-                if(this.captureGuard == 1)
+                int guardValue = Interlocked.Increment(ref this.captureGuard);
+                if(guardValue == 1)
                 {
-                    CaptureMouse();
+                    Console.WriteLine(this.CaptureMouse());
                 }
             }
         }
 
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
         {
+            Mouse.Capture(null);
             base.OnPreviewMouseLeftButtonUp(e);
-            ReleaseMouseCapture();
             if(this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background == Brushes.DarkGray)
             {
                 this.addButton.Background = null;
@@ -223,8 +223,6 @@ namespace ChromeTabs
             {
                 return;
             }
-            this.captureGuard = 0;
-
             ThicknessAnimation moveBackAnimation = new ThicknessAnimation(draggedTab.Margin, new Thickness(0), new Duration(TimeSpan.FromSeconds(.1)));
             Storyboard.SetTarget(moveBackAnimation, draggedTab);
             Storyboard.SetTargetProperty(moveBackAnimation, new PropertyPath(FrameworkElement.MarginProperty));
@@ -239,8 +237,9 @@ namespace ChromeTabs
                 Canvas.SetZIndex(draggedTab, 0);
                 draggedTab.Margin = new Thickness(0);
                 ParentTabControl.ChangeSelectedItem(draggedTab);
-                draggedTab = null;
+                this.draggedTab = null;
                 sb.Remove();
+                this.captureGuard = 0;
             };
             sb.Begin();
         }
@@ -294,6 +293,9 @@ namespace ChromeTabs
         private double defaultMeasureHeight;
         private double currentTabWidth;
         private int captureGuard;
+        private int originalIndex;
+        private int slideIndex;
+        private int slideIntervals;
         private ChromeTabItem draggedTab;
         private Point downPoint;
         private ChromeTabControl parent;
