@@ -245,6 +245,12 @@ namespace ChromeTabs
             sb.Begin();
         }
 
+        protected override void OnVisualParentChanged(DependencyObject oldParent)
+        {
+            base.OnVisualParentChanged(oldParent);
+            this.parent = null;
+        }
+
         private ChromeTabControl ParentTabControl
         {
             get
