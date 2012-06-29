@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Windows.Media.Animation;
+using System.Threading;
 
 namespace ChromeTabs
 {
@@ -161,7 +162,6 @@ namespace ChromeTabs
             if(draggedTab != null)
             {
                 Canvas.SetZIndex(draggedTab, 1000);
-                CaptureMouse();
             }
         }
 
@@ -182,11 +182,20 @@ namespace ChromeTabs
             Point nowPoint = e.GetPosition(this);
             Thickness margin = new Thickness(nowPoint.X - this.downPoint.X, 0, this.downPoint.X - nowPoint.X, 0);
             draggedTab.Margin = margin;
+            if(margin.Left != 0)
+            {
+                Interlocked.Increment(ref this.captureGuard);
+                if(this.captureGuard == 1)
+                {
+                    CaptureMouse();
+                }
+            }
         }
 
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonUp(e);
+            ReleaseMouseCapture();
             if(this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background == Brushes.DarkGray)
             {
                 this.addButton.Background = null;
@@ -202,7 +211,7 @@ namespace ChromeTabs
             {
                 return;
             }
-            ReleaseMouseCapture();
+            this.captureGuard = 0;
 
             ThicknessAnimation moveBackAnimation = new ThicknessAnimation(draggedTab.Margin, new Thickness(0), new Duration(TimeSpan.FromSeconds(.1)));
             Storyboard.SetTarget(moveBackAnimation, draggedTab);
@@ -249,6 +258,7 @@ namespace ChromeTabs
         private double minTabWidth;
         private double defaultMeasureHeight;
         private double currentTabWidth;
+        private int captureGuard;
         private ChromeTabItem draggedTab;
         private Point downPoint;
         private ChromeTabControl parent;
