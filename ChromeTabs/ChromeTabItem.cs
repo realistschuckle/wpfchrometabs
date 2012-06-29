@@ -76,6 +76,15 @@ namespace ChromeTabs
             set { SetValue(IsSelectedProperty, value); }
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if(e.Key == Key.Enter || e.Key == Key.Space || e.Key == Key.Return)
+            {
+                ParentTabControl.ChangeSelectedItem(this);
+            }
+        }
+
         private void Close()
         {
             ParentTabControl.RemoveTab(this);
