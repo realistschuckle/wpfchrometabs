@@ -161,6 +161,7 @@ namespace ChromeTabs
             if(draggedTab != null)
             {
                 Canvas.SetZIndex(draggedTab, 1000);
+                CaptureMouse();
             }
         }
 
@@ -201,6 +202,8 @@ namespace ChromeTabs
             {
                 return;
             }
+            ReleaseMouseCapture();
+
             ThicknessAnimation moveBackAnimation = new ThicknessAnimation(draggedTab.Margin, new Thickness(0), new Duration(TimeSpan.FromSeconds(.1)));
             Storyboard.SetTarget(moveBackAnimation, draggedTab);
             Storyboard.SetTargetProperty(moveBackAnimation, new PropertyPath(FrameworkElement.MarginProperty));
