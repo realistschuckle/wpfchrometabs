@@ -106,7 +106,7 @@
                             </Path.RenderTransform>
                         </Path>
                         <Label Margin="10 0 0 0" VerticalAlignment="Center" Content="{TemplateBinding Header}" Grid.Column="1" />
-                        <Button Margin="0 0 10 0" Style="{StaticResource CloseButtonStyle}" Grid.Column="2" Command="{x:Static local:ChromeTabItem.CloseTabCommand}" />
+                        <Button KeyboardNavigation.IsTabStop="False" Margin="0 0 10 0" Style="{StaticResource CloseButtonStyle}" Grid.Column="2" Command="{x:Static local:ChromeTabItem.CloseTabCommand}" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
