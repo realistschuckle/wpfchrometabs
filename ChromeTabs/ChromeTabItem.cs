@@ -70,6 +70,14 @@ namespace ChromeTabs
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeTabCommand, HandleCloseTabCommand));
         }
 
+        public int Index
+        {
+            get
+            {
+                return ParentTabControl == null ? -1 : ParentTabControl.GetTabIndex(this);
+            }
+        }
+
         public bool IsSelected
         {
             get { return (bool)GetValue(IsSelectedProperty); }
