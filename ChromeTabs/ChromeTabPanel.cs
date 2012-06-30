@@ -269,20 +269,40 @@ namespace ChromeTabs
             if(this.IsMouseCaptured)
             {
                 Mouse.Capture(null);
-            }
 
-            Action completed = () =>
+                double offset = 0;
+                if(this.slideIndex < this.originalIndex + 1)
+                {
+                    offset = this.slideIntervals[this.slideIndex + 1] - 2 * this.currentTabWidth / 3 + this.overlap;
+                }
+                else if(this.slideIndex > this.originalIndex + 1)
+                {
+                    offset = this.slideIntervals[this.slideIndex - 1] + 2 * this.currentTabWidth / 3 - this.overlap;
+                }
+                Console.WriteLine(offset);
+                Action completed = () =>
+                {
+                    if(this.draggedTab != null)
+                    {
+                        ParentTabControl.ChangeSelectedItem(this.draggedTab);
+                        this.draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
+                        this.draggedTab = null;
+                        this.captureGuard = 0;
+                        ParentTabControl.MoveTab(this.originalIndex, this.slideIndex - 1);
+                    }
+                };
+                Reanimate(this.draggedTab, offset, .1, completed);
+            }
+            else
             {
                 if(this.draggedTab != null)
                 {
-                Canvas.SetZIndex(this.draggedTab, 0);
-                this.draggedTab.Margin = new Thickness(0);
-                ParentTabControl.ChangeSelectedItem(this.draggedTab);
+                    ParentTabControl.ChangeSelectedItem(this.draggedTab);
+                    this.draggedTab.Margin = new Thickness(0);
+                }
                 this.draggedTab = null;
                 this.captureGuard = 0;
-                }
-            };
-            Reanimate(this.draggedTab, 0, .1, completed);
+            }
         }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)

@@ -132,10 +132,29 @@ namespace ChromeTabs
             int index = this.GetTabIndex(item);
             if(index > -1)
             {
-                Canvas.SetZIndex(this.AsTabItem(this.SelectedItem), 0);
+                if(this.SelectedItem != null)
+                {
+                    Canvas.SetZIndex(this.AsTabItem(this.SelectedItem), 0);
+                }
                 this.SelectedIndex = index;
                 Canvas.SetZIndex(item, 1001);
             }
+        }
+
+        internal void MoveTab(int fromIndex, int toIndex)
+        {
+            if(this.Items.Count == 0)
+            {
+                return;
+            }
+            object tab = this.Items[fromIndex];
+            this.Items.RemoveAt(fromIndex);
+            this.Items.Insert(toIndex, tab);
+            for(int i = 0; i < this.Items.Count; i += 1)
+            {
+                this.AsTabItem(this.Items[i]).Margin = new Thickness(0);
+            }
+            this.SelectedItem = tab;
         }
 
         internal void SetCanAddTab(bool value)
