@@ -154,6 +154,7 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
+            this.slideIntervals = null;
             if(this.addButtonRect.Contains(e.GetPosition(this)))
             {
                 this.addButton.Background = Brushes.DarkGray;
@@ -199,14 +200,61 @@ namespace ChromeTabs
                 int guardValue = Interlocked.Increment(ref this.captureGuard);
                 if(guardValue == 1)
                 {
-                    Console.WriteLine(this.CaptureMouse());
+                    this.originalIndex = this.draggedTab.Index;
+                    this.slideIndex = this.originalIndex + 1;
+                    this.slideIntervals = new List<double>();
+                    this.slideIntervals.Add(double.NegativeInfinity);
+                    for(int i = 1; i <= this.Children.Count; i += 1)
+                    {
+                        var diff = i - this.slideIndex;
+                        var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
+                        var bound = Math.Min(1, Math.Abs(diff)) * ((sign * this.currentTabWidth / 3) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (this.currentTabWidth - this.overlap)));
+                        this.slideIntervals.Add(bound);
+                    }
+                    this.slideIntervals.Add(double.PositiveInfinity);
+                    this.CaptureMouse();
+                }
+                else
+                {
+                    int changed = 0;
+                    if(margin.Left < this.slideIntervals[this.slideIndex - 1])
+                    {
+                        SwapSlideInterval(this.slideIndex - 1);
+                        this.slideIndex -= 1;
+                        changed = 1;
+                    }
+                    else if(margin.Left > this.slideIntervals[this.slideIndex + 1])
+                    {
+                        SwapSlideInterval(this.slideIndex + 1);
+                        this.slideIndex += 1;
+                        changed = -1;
+                    }
+                    if(changed != 0)
+                    {
+                        var rightedOriginalIndex = this.originalIndex + 1;
+                        var diff = 1;
+                        if(changed > 0 && this.slideIndex >= rightedOriginalIndex)
+                        {
+                            changed = 0;
+                            diff = 0;
+                        }
+                        else if(changed < 0 && this.slideIndex <= rightedOriginalIndex)
+                        {
+                            changed = 0;
+                            diff = 2;
+                        }
+                        ChromeTabItem shiftedTab = this.Children[this.slideIndex - diff] as ChromeTabItem;
+                        if(shiftedTab != this.draggedTab)
+                        {
+                            StickyReanimate(shiftedTab, changed * (this.currentTabWidth - this.overlap), .25);
+                        }
+                    }
                 }
             }
         }
 
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            Mouse.Capture(null);
             base.OnPreviewMouseLeftButtonUp(e);
             if(this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background == Brushes.DarkGray)
             {
@@ -218,30 +266,23 @@ namespace ChromeTabs
                 }
                 return;
             }
-
-            if(draggedTab == null)
+            if(this.IsMouseCaptured)
             {
-                return;
+                Mouse.Capture(null);
             }
-            ThicknessAnimation moveBackAnimation = new ThicknessAnimation(draggedTab.Margin, new Thickness(0), new Duration(TimeSpan.FromSeconds(.1)));
-            Storyboard.SetTarget(moveBackAnimation, draggedTab);
-            Storyboard.SetTargetProperty(moveBackAnimation, new PropertyPath(FrameworkElement.MarginProperty));
-            Storyboard sb = new Storyboard();
-            sb.Children.Add(moveBackAnimation);
-            sb.Completed += (o, ea) =>
+
+            Action completed = () =>
             {
-                if(draggedTab == null)
+                if(this.draggedTab != null)
                 {
-                    return;
-                }
-                Canvas.SetZIndex(draggedTab, 0);
-                draggedTab.Margin = new Thickness(0);
-                ParentTabControl.ChangeSelectedItem(draggedTab);
+                Canvas.SetZIndex(this.draggedTab, 0);
+                this.draggedTab.Margin = new Thickness(0);
+                ParentTabControl.ChangeSelectedItem(this.draggedTab);
                 this.draggedTab = null;
-                sb.Remove();
                 this.captureGuard = 0;
+                }
             };
-            sb.Begin();
+            Reanimate(this.draggedTab, 0, .1, completed);
         }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
@@ -267,6 +308,38 @@ namespace ChromeTabs
             }
         }
 
+        private static void StickyReanimate(ChromeTabItem tab, double left, double duration)
+        {
+            Action completed = () =>
+            {
+                tab.Margin = new Thickness(left, 0, -left, 0);
+            };
+            Reanimate(tab, left, duration, completed);
+        }
+
+        private static void Reanimate(ChromeTabItem tab, double left, double duration, Action completed)
+        {
+            if(tab == null)
+            {
+                return;
+            }
+            Thickness offset = new Thickness(left, 0, -left, 0);
+            ThicknessAnimation moveBackAnimation = new ThicknessAnimation(tab.Margin, offset, new Duration(TimeSpan.FromSeconds(duration)));
+            Storyboard.SetTarget(moveBackAnimation, tab);
+            Storyboard.SetTargetProperty(moveBackAnimation, new PropertyPath(FrameworkElement.MarginProperty));
+            Storyboard sb = new Storyboard();
+            sb.Children.Add(moveBackAnimation);
+            sb.Completed += (o, ea) =>
+            {
+                sb.Remove();
+                if(completed != null)
+                {
+                    completed();
+                }
+            };
+            sb.Begin();
+        }
+
         private void SetTabItemsOnTabs()
         {
             for(int i = 0; i < this.Children.Count; i += 1)
@@ -284,6 +357,12 @@ namespace ChromeTabs
             }
         }
 
+        private void SwapSlideInterval(int index)
+        {
+            this.slideIntervals[this.slideIndex] = this.slideIntervals[index];
+            this.slideIntervals[index] = 0;
+        }
+
         private Size finalSize;
         private double overlap;
         private double leftMargin;
@@ -295,7 +374,7 @@ namespace ChromeTabs
         private int captureGuard;
         private int originalIndex;
         private int slideIndex;
-        private int slideIntervals;
+        private List<double> slideIntervals;
         private ChromeTabItem draggedTab;
         private Point downPoint;
         private ChromeTabControl parent;

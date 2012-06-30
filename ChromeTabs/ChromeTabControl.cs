@@ -57,40 +57,16 @@ namespace ChromeTabs
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
         }
 
-        protected override void OnInitialized(EventArgs e)
+        public void AddTab(object tab, bool select)
         {
-            base.OnInitialized(e);
-            bool somethingSelected = false;
-            foreach (UIElement element in this.Items)
+            if(!CanAddTab)
             {
-                somethingSelected |= ChromeTabItem.GetIsSelected(element);
+                return;
             }
-            if (!somethingSelected)
+            this.Items.Add(tab);
+            if(select || this.Items.Count == 1)
             {
-                this.SelectedIndex = 0;
-            }
-            KeyboardNavigation.SetIsTabStop(this, false);
-        }
-
-        public object SelectedContent
-        {
-            get { return (object)GetValue(SelectedContentProperty); }
-            set { SetValue(SelectedContentProperty, value); }
-        }
-
-        internal void ChangeSelectedItem(ChromeTabItem item)
-        {
-            for (int i = 0; i < this.Items.Count; i += 1)
-            {
-                object dep = this.Items[i];
-                ChromeTabItem tabItem = this.AsTabItem(dep);
-                if (tabItem == item)
-                {
-                    Canvas.SetZIndex(this.AsTabItem(this.SelectedItem), 0);
-                    this.SelectedIndex = i;
-                    Canvas.SetZIndex(tabItem, 1001);
-                    return;
-                }
+                this.SelectedIndex = this.Items.Count - 1;
             }
         }
 
@@ -99,39 +75,21 @@ namespace ChromeTabs
             get { return (bool)GetValue(CanAddTabProperty); }
         }
 
-        internal void SetCanAddTab(bool value)
-        {
-            SetValue(CanAddTabPropertyKey, value);
-        }
-
-        public void AddTab(object tab, bool select)
-        {
-            if(!CanAddTab)
-            {
-                return;
-            }
-            this.Items.Add(tab);
-            if (select || this.Items.Count == 1)
-            {
-                this.SelectedIndex = this.Items.Count - 1;
-            }
-        }
-
         public void RemoveTab(object tab)
         {
             int selectedIndex = this.SelectedIndex;
             bool removedSelectedTab = false;
             ChromeTabItem removeItem = this.AsTabItem(tab);
-            foreach (object item in this.Items)
+            foreach(object item in this.Items)
             {
                 ChromeTabItem tabItem = this.AsTabItem(item);
-                if (tabItem != null && tabItem == removeItem)
+                if(tabItem != null && tabItem == removeItem)
                 {
-                    if (tabItem.Content == this.SelectedContent)
+                    if(tabItem.Content == this.SelectedContent)
                     {
                         removedSelectedTab = true;
                     }
-                    if (this.ObjectToContainer.ContainsKey(tab))
+                    if(this.ObjectToContainer.ContainsKey(tab))
                     {
                         this.ObjectToContainer.Remove(tab);
                     }
@@ -139,15 +97,75 @@ namespace ChromeTabs
                     break;
                 }
             }
-            if (removedSelectedTab && this.Items.Count > 0)
+            if(removedSelectedTab && this.Items.Count > 0)
             {
                 this.SelectedItem = this.Items[Math.Min(selectedIndex, this.Items.Count - 1)];
             }
-            else if (removedSelectedTab)
+            else if(removedSelectedTab)
             {
                 this.SelectedItem = null;
                 this.SelectedContent = null;
             }
+        }
+
+        public object SelectedContent
+        {
+            get { return (object)GetValue(SelectedContentProperty); }
+            set { SetValue(SelectedContentProperty, value); }
+        }
+
+        internal int GetTabIndex(ChromeTabItem item)
+        {
+            for(int i = 0; i < this.Items.Count; i += 1)
+            {
+                ChromeTabItem tabItem = this.AsTabItem(this.Items[i]);
+                if(tabItem == item)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        internal void ChangeSelectedItem(ChromeTabItem item)
+        {
+            int index = this.GetTabIndex(item);
+            if(index > -1)
+            {
+                Canvas.SetZIndex(this.AsTabItem(this.SelectedItem), 0);
+                this.SelectedIndex = index;
+                Canvas.SetZIndex(item, 1001);
+            }
+        }
+
+        internal void SetCanAddTab(bool value)
+        {
+            SetValue(CanAddTabPropertyKey, value);
+        }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new ChromeTabItem { Header = "New Tab" };
+        }
+
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return (item is ChromeTabItem);
+        }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            bool somethingSelected = false;
+            foreach(UIElement element in this.Items)
+            {
+                somethingSelected |= ChromeTabItem.GetIsSelected(element);
+            }
+            if(!somethingSelected)
+            {
+                this.SelectedIndex = 0;
+            }
+            KeyboardNavigation.SetIsTabStop(this, false);
         }
 
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
@@ -180,16 +198,6 @@ namespace ChromeTabs
             this.SelectedContent = item != null? item.Content : null;
         }
 
-        protected override bool IsItemItsOwnContainerOverride(object item)
-        {
-            return (item is ChromeTabItem);
-        }
-
-        protected override DependencyObject GetContainerForItemOverride()
-        {
-            return new ChromeTabItem{ Header = "New Tab" };
-        }
-
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             base.PrepareContainerForItemOverride(element, item);
@@ -198,6 +206,16 @@ namespace ChromeTabs
                 this.ObjectToContainer[item] = element;
                 this.SetChildrenZ();
             }
+        }
+
+        private ChromeTabItem AsTabItem(object item)
+        {
+            ChromeTabItem tabItem = item as ChromeTabItem;
+            if(tabItem == null && item != null && this.ObjectToContainer.ContainsKey(item))
+            {
+                tabItem = this.ObjectToContainer[item] as ChromeTabItem;
+            }
+            return tabItem;
         }
 
         private Dictionary<object, DependencyObject> ObjectToContainer
@@ -210,16 +228,6 @@ namespace ChromeTabs
                 }
                 return objectToContainerMap;
             }
-        }
-
-        private ChromeTabItem AsTabItem(object item)
-        {
-            ChromeTabItem tabItem = item as ChromeTabItem;
-            if (tabItem == null && item != null && this.ObjectToContainer.ContainsKey(item))
-            {
-                tabItem = this.ObjectToContainer[item] as ChromeTabItem;
-            }
-            return tabItem;
         }
 
         private void SetChildrenZ()
