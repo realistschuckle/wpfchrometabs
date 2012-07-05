@@ -76,11 +76,11 @@ namespace ChromeTabs
 
         protected override Visual GetVisualChild(int index)
         {
-            if (index == this.VisualChildrenCount - 1)
+            if(index == this.VisualChildrenCount - 1)
             {
                 return this.addButton;
             }
-            else if (index < this.VisualChildrenCount - 1)
+            else if(index < this.VisualChildrenCount - 1)
             {
                 return base.GetVisualChild(index);
             }
@@ -164,7 +164,7 @@ namespace ChromeTabs
 
             this.downPoint = e.GetPosition(this);
             HitTestResult result = VisualTreeHelper.HitTest(this, this.downPoint);
-            if (result == null) { return; }
+            if(result == null) { return; }
             DependencyObject source = result.VisualHit;
             while(source != null && !this.Children.Contains(source as UIElement))
             {
@@ -172,29 +172,34 @@ namespace ChromeTabs
             }
             if(source == null) { return; }
             draggedTab = source as ChromeTabItem;
-            if(draggedTab != null)
+            if(draggedTab != null && this.Children.Count > 1)
             {
                 Canvas.SetZIndex(draggedTab, 1000);
+            }
+            else if(draggedTab != null && this.Children.Count == 1)
+            {
+                this.draggingWindow = true;
+                Window.GetWindow(this).DragMove();
             }
         }
 
         protected override void OnPreviewMouseMove(MouseEventArgs e)
         {
             base.OnPreviewMouseMove(e);
-            if (this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background != Brushes.White && this.addButton.Background != Brushes.DarkGray)
+            if(this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background != Brushes.White && this.addButton.Background != Brushes.DarkGray)
             {
                 this.addButton.Background = Brushes.White;
                 this.InvalidateVisual();
             }
-            else if (!this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background != null)
+            else if(!this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background != null)
             {
                 this.addButton.Background = null;
                 this.InvalidateVisual();
             }
-            if (draggedTab == null) { return; }
+            if(this.draggedTab == null || this.draggingWindow) { return; }
             Point nowPoint = e.GetPosition(this);
             Thickness margin = new Thickness(nowPoint.X - this.downPoint.X, 0, this.downPoint.X - nowPoint.X, 0);
-            draggedTab.Margin = margin;
+            this.draggedTab.Margin = margin;
             if(margin.Left != 0)
             {
                 int guardValue = Interlocked.Increment(ref this.captureGuard);
@@ -256,6 +261,7 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonUp(e);
+            this.draggingWindow = false;
             if(this.addButtonRect.Contains(e.GetPosition(this)) && this.addButton.Background == Brushes.DarkGray)
             {
                 this.addButton.Background = null;
@@ -315,7 +321,7 @@ namespace ChromeTabs
         {
             get
             {
-                if (this.parent == null)
+                if(this.parent == null)
                 {
                     DependencyObject parent = this;
                     while (parent != null && !(parent is ChromeTabControl))
@@ -383,6 +389,7 @@ namespace ChromeTabs
             this.slideIntervals[index] = 0;
         }
 
+        private bool draggingWindow;
         private Size finalSize;
         private double overlap;
         private double leftMargin;
